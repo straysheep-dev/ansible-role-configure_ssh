@@ -49,7 +49,7 @@
   args:
     executable: /bin/bash
   when: (ssh_host_public_keys.files | length == 0) or
-        (regenerate_hostkeys | bool)
+        (regenerate_host_keys | bool)
   become: true
   become_method: ansible.builtin.sudo
   tags:
