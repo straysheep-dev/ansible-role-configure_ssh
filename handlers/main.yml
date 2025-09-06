@@ -1,0 +1,13 @@
+---
+# handlers file for configure_ssh
+
+# https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_handlers.html
+
+# This handler currently isn't used and may be removed in the future
+# The service.yml file will always restart the ssh daemon
+- name: Restart SSH
+  ansible.builtin.service:
+    name: ssh
+    state: restarted
+  become: true
+  become_method: ansible.builtin.sudo

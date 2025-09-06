@@ -1,0 +1,34 @@
+---
+# configure_ssh/tasks/minimal.yml
+
+- name: Set port (sshd_config)
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^.Port.*$'
+    line: Port {{ ssh_port }}
+  become: true
+  become_method: ansible.builtin.sudo
+
+- name: Enforce Public Key Auth (sshd_config)
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^.PasswordAuthentication.*$'
+    line: PasswordAuthentication no
+  become: true
+  become_method: ansible.builtin.sudo
+
+- name: Restrict empty passwords (sshd_config)
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^.PermitEmptyPasswords.*$'
+    line: PermitEmptyPasswords no
+  become: true
+  become_method: ansible.builtin.sudo
+
+- name: Restrict root login (sshd_config)
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^.PermitRootLogin.*$'
+    line: PermitRootLogin prohibit-password
+  become: true
+  become_method: ansible.builtin.sudo

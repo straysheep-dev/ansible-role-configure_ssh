@@ -1,0 +1,27 @@
+---
+# configure_ssh/tasks/service.yml
+
+- name: "Gather service facts"
+  ansible.builtin.service_facts:
+
+- name: "Start and enable openssh-server (ssh.service)"
+  ansible.builtin.service:
+    name: ssh.service
+    state: restarted
+    enabled: true
+  when: "'ssh.service' in ansible_facts['services']"
+  become: true
+  become_method: ansible.builtin.sudo
+  tags:
+    - molecule-idempotence-notest
+
+- name: "Start and enable openssh-server (sshd.service)"
+  ansible.builtin.service:
+    name: sshd.service
+    state: restarted
+    enabled: true
+  when: "'sshd.service' in ansible_facts['services']"
+  become: true
+  become_method: ansible.builtin.sudo
+  tags:
+    - molecule-idempotence-notest

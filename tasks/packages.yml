@@ -1,0 +1,56 @@
+---
+# configure_ssh/tasks/package.yml
+
+- name: "Update pacakge cache (Debian/Ubuntu)"
+  ansible.builtin.apt:
+    update_cache: true
+  when: ansible_facts['os_family'] == "Debian"
+  become: true
+  become_method: ansible.builtin.sudo
+
+- name: "Install openssh-server"
+  ansible.builtin.package:
+    name:
+      - openssh-server
+    state: present
+  when: ansible_facts['system'] == "Linux"
+  become: true
+  become_method: ansible.builtin.sudo
+
+- name: Find all public key files
+  ansible.builtin.find:
+    paths: /etc/ssh/
+    file_type: file
+    patterns: 'ssh_host_*_key.pub'
+  register: ssh_host_public_keys
+
+- name: Find all private key files
+  ansible.builtin.find:
+    paths: /etc/ssh/
+    file_type: file
+    patterns: 'ssh_host_*_key'
+  register: ssh_host_private_keys
+
+# https://docs.ansible.com/ansible/latest/playbook_guide/complex_data_manipulation.html#extract-keys-from-a-dictionary-matching-elements-from-a-list
+- name: "Print public key file variables (debug)"
+  ansible.builtin.debug:
+    msg: "{{ ssh_host_public_keys.files | map(attribute='path') | list }}"
+
+# https://docs.ansible.com/ansible/latest/playbook_guide/complex_data_manipulation.html#extract-keys-from-a-dictionary-matching-elements-from-a-list
+- name: "Print private key file variables (debug)"
+  ansible.builtin.debug:
+    msg: "{{ ssh_host_private_keys.files | map(attribute='path') | list }}"
+
+- name: "Regenerate host keys"
+  ansible.builtin.shell: |
+    set -o pipefail
+    rm -rf /etc/ssh/ssh_host_*
+    ssh-keygen -A
+  args:
+    executable: /bin/bash
+  when: (ssh_host_public_keys.files | length == 0) or
+        (regenerate_hostkeys | bool)
+  become: true
+  become_method: ansible.builtin.sudo
+  tags:
+    - molecule-idempotence-notest

@@ -1,0 +1,6 @@
+---
+# defaults file for configure_ssh
+
+regenerate_hostkeys: false  # Set to true to run ssh-keygen -A and rotate the existing host keys
+ssh_config_choice: "compliance" # Options are minimal, compliance.
+ssh_port: 22  # Can be anything from 1-65535, typically 1-1024 are reserved and privileged ports

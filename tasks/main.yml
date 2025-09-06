@@ -1,0 +1,17 @@
+---
+# tasks file for configure_ssh
+
+- name: "Include Linux package tasks"
+  ansible.builtin.include_tasks: packages.yml
+
+- name: "Include minimal tasks"
+  ansible.builtin.include_tasks: minimal.yml
+  when: ssh_config_choice == "minimal"
+
+- name: "Include compliance tasks"
+  ansible.builtin.include_tasks: compliance.yml
+  when: ssh_config_choice == "compliance"
+
+# We don't want to start the service until it's configured
+- name: "Include service tasks"
+  ansible.builtin.include_tasks: service.yml
